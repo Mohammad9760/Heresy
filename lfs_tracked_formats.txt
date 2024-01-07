@@ -1,14 +1,14 @@
-*.psd
-*.png
-*.jpg
-*.jpeg
-*.tga
-*.tif
-*.dds
-*.fbx
-*.obj
-*.blend
-*.bvh
-*.dae
-*.wav
-*.mp3
+git lfs track "*.psd"
+git lfs track "*.png"
+git lfs track "*.jpg"
+git lfs track "*.jpeg"
+git lfs track "*.tga"
+git lfs track "*.tif"
+git lfs track "*.dds"
+git lfs track "*.fbx"
+git lfs track "*.obj"
+git lfs track "*.blend"
+git lfs track "*.bvh"
+git lfs track "*.dae"
+git lfs track "*.wav"
+git lfs track "*.mp3"
