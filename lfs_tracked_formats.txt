@@ -1,0 +1,14 @@
+*.psd
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.tif
+*.dds
+*.fbx
+*.obj
+*.blend
+*.bvh
+*.dae
+*.wav
+*.mp3
