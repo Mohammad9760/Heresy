@@ -70,3 +70,10 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Files not needed for the project
+/[Aa]ssets/[Ss]uperEditor.meta
+/[Aa]ssets/[Ss]uperEditor/
+*.sublime-project
+*.sublime-workspace
+/mono_crash.mem.2481.1.blob
