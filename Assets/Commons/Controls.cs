@@ -69,7 +69,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""id"": ""9333aea4-67f4-4653-a5bd-a49344679513"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press(pressPoint=0.65,behavior=2)"",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": true
                 },
                 {
@@ -97,6 +97,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchShoulder"",
+                    ""type"": ""Button"",
+                    ""id"": ""3d527957-c60a-4195-a512-68c31b4c1add"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -364,6 +373,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""Reload"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34420ec7-e20a-4cf5-891c-74bb13459888"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboadMouse"",
+                    ""action"": ""SwitchShoulder"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -436,6 +456,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
+        m_Player_SwitchShoulder = m_Player.FindAction("SwitchShoulder", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Back = m_UI.FindAction("Back", throwIfNotFound: true);
@@ -506,6 +527,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_Reload;
+    private readonly InputAction m_Player_SwitchShoulder;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -518,6 +540,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputAction @Reload => m_Wrapper.m_Player_Reload;
+        public InputAction @SwitchShoulder => m_Wrapper.m_Player_SwitchShoulder;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -551,6 +574,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Reload.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReload;
                 @Reload.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReload;
                 @Reload.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReload;
+                @SwitchShoulder.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSwitchShoulder;
+                @SwitchShoulder.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSwitchShoulder;
+                @SwitchShoulder.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSwitchShoulder;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -579,6 +605,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
+                @SwitchShoulder.started += instance.OnSwitchShoulder;
+                @SwitchShoulder.performed += instance.OnSwitchShoulder;
+                @SwitchShoulder.canceled += instance.OnSwitchShoulder;
             }
         }
     }
@@ -644,6 +673,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnCrouch(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+        void OnSwitchShoulder(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

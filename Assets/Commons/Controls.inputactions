@@ -47,7 +47,7 @@
                     "id": "9333aea4-67f4-4653-a5bd-a49344679513",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(pressPoint=0.65,behavior=2)",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": true
                 },
                 {
@@ -75,6 +75,15 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Press",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchShoulder",
+                    "type": "Button",
+                    "id": "3d527957-c60a-4195-a512-68c31b4c1add",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
                 }
             ],
@@ -340,6 +349,17 @@
                     "processors": "",
                     "groups": "Controller",
                     "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "34420ec7-e20a-4cf5-891c-74bb13459888",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboadMouse",
+                    "action": "SwitchShoulder",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

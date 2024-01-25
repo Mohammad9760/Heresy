@@ -122,6 +122,7 @@ public class PlayerController : ThirdPersonCharacterController
 	    _input.Attack.performed += (ctx) => Attack(true);
 	    _input.Attack.canceled += (ctx) => Attack(false);
 	    _input.Reload.performed += (ctx) => Reload();
+	    _input.SwitchShoulder.performed += (ctx) => StartCoroutine(switchShoulder());
 
     }
     
@@ -152,6 +153,27 @@ public class PlayerController : ThirdPersonCharacterController
     //        yield return null;
     //    }
     //}
+
+	private IEnumerator switchShoulder()
+	{
+		var side = AimCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide;
+		var targetSide = 1f - side;
+		var offset = AimCamera.GetCinemachineComponent<CinemachineComposer>().m_TrackedObjectOffset;
+		var targetOffset = offset * -1;
+		//AimCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide = targetSide;
+		//AimCamera.GetCinemachineComponent<CinemachineComposer>().m_TrackedObjectOffset = targetOffset;
+		//yield return null;
+		for (float t = 0; ; t += Time.deltaTime * 5.0f) 
+		{
+			AimCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide = Mathf.Lerp(side, targetSide, t);
+			AimCamera.GetCinemachineComponent<CinemachineComposer>().m_TrackedObjectOffset = Vector3.Lerp(offset, targetOffset, t);
+			//t = Mathf.Clamp01(t);
+			if(Mathf.Clamp01(t) == 1) break;
+			print(t);
+			yield return null;
+		}
+
+	}
 
     private const float _threshold = 0.01f;
 
