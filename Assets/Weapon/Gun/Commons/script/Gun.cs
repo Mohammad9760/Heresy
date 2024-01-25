@@ -17,7 +17,7 @@ public enum FireMode
 public class Gun : MonoBehaviour
 {
 	public LayerMask raycastLayers;
-	private Camera camera;
+	private static Camera camera;
 	private Vector3 viewportCenter = new Vector3(0.5f, 0.5f, 0.0f);
 	
 	public VisualEffect effects;
@@ -30,6 +30,7 @@ public class Gun : MonoBehaviour
 	private ConstraintSource constraintSource;
 	
 	public GunProperties Specs;
+	public byte ammoCount => (byte)Ammo.count(Specs.ammunition);
     
 	public byte magazineRounds;
 	public bool magazineFull => magazineRounds >= Specs.magazineCapacity;
@@ -57,18 +58,23 @@ public class Gun : MonoBehaviour
 
 	private void Start()
 	{
+		if(camera == null)
+			camera = Camera.main;
 		animator = GetComponent<Animator>();
 		audioSource = GetComponent<AudioSource>();
-		camera = Camera.main;
 		parentConstraint = GetComponent<ParentConstraint>();
-		
-		//ReloadDelay = animator.runtimeAnimatorController.animationClips.First(a => a.name == "Reload").length;
-		
+
 		// temp
-		ReloadFinished = true;
-		magazineRounds = Specs.magazineCapacity;
+		//ReloadFinished = true;
+		//magazineRounds = Specs.magazineCapacity;
+		Ammo.add(Specs.ammunition, 17);
 		
-    }
+	}
+    
+	private void Update()
+	{
+		print(magazineRounds + " / " + Ammo.count(Specs.ammunition));
+	}
 
 	public virtual IEnumerator Reload()
 	{
@@ -76,11 +82,17 @@ public class Gun : MonoBehaviour
 
 		animator.SetBool("Empty", false);
 		animator.SetTrigger("Reload");
-		print (animator.GetCurrentAnimatorClipInfo(0).Length);
 		yield return new WaitForSeconds(reloadDelay);
-		//yield return new WaitWhile(() => animator.GetCurrentAnimatorStateInfo(0).IsTag("Reload"));
-		magazineRounds = Specs.magazineCapacity;
-	
+		if(ammoCount < Specs.magazineCapacity - magazineRounds)
+		{
+			magazineRounds += ammoCount;
+			Ammo.subtract(Specs.ammunition, ammoCount);
+		}
+		else
+		{
+			Ammo.subtract(Specs.ammunition, Specs.magazineCapacity - magazineRounds);
+			magazineRounds = Specs.magazineCapacity;
+		}
 		ReloadFinished = true;
     }
 
@@ -116,7 +128,7 @@ public class Gun : MonoBehaviour
     {
 	    Ray bullet = camera.ViewportPointToRay(viewportCenter);
 	    RaycastHit hit;
-	    if(Physics.Raycast(bullet, out hit, 1000, raycastLayers))
+	    if(Physics.Raycast(bullet, out hit, Specs.ammunition.range, raycastLayers))
 	    {
 	    	effects.SetVector3("impact_point", hit.point);
 	    	BulletImpact.ImpactEffect(hit.point, hit.normal);

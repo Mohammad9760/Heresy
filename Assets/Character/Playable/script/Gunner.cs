@@ -9,7 +9,7 @@ public class Gunner : MonoBehaviour
 	public Gun[] guns;
 	[SerializeField] private Gun selectedGun;
 	
-	public bool CanReload => !selectedGun.magazineFull; // & not out of ammo
+	public bool CanReload => !selectedGun.magazineFull && selectedGun.ammoCount > 0;
 	public bool IsDuringReload => !selectedGun.ReloadFinished;
 	
 	public byte LocomotionLayerIndex => selectedGun._animLayerLocomotion;

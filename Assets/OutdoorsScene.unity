@@ -222,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7473605
 Transform:
   m_ObjectHideFlags: 0
@@ -777,7 +777,6 @@ MonoBehaviour:
   m_Script: {fileID: 621067347}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Entries: []
 --- !u!4 &303685630
 Transform:
   m_ObjectHideFlags: 19
@@ -1094,7 +1093,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0.5, y: 0.5, z: 0}
+        m_Name: impact_normal
+        m_Overridden: 0
     m_Vector4f:
       m_Array: []
     m_Uint:
