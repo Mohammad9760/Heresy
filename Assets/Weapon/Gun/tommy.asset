@@ -16,3 +16,4 @@ MonoBehaviour:
   magazineCapacity: 30
   RoundPerSecond: 8
   fireMode: 0
+  muzzleClimb: 1.3

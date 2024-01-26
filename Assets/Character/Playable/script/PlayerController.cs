@@ -32,6 +32,7 @@ public class PlayerController : ThirdPersonCharacterController
     public PositionConstraint cameraRigPositionConstraint;
     public Rig lookRig, aimRig;
 	private Animator _animator => character._animator;
+	private Coroutine shoulderSwitching;
 	
 	private Gunner gun;
     #endregion
@@ -122,7 +123,7 @@ public class PlayerController : ThirdPersonCharacterController
 	    _input.Attack.performed += (ctx) => Attack(true);
 	    _input.Attack.canceled += (ctx) => Attack(false);
 	    _input.Reload.performed += (ctx) => Reload();
-	    _input.SwitchShoulder.performed += (ctx) => StartCoroutine(switchShoulder());
+	    _input.SwitchShoulder.performed += (ctx) => shoulderSwitching = StartCoroutine(switchShoulder());
 
     }
     
@@ -156,6 +157,7 @@ public class PlayerController : ThirdPersonCharacterController
 
 	private IEnumerator switchShoulder()
 	{
+		yield return shoulderSwitching;
 		var side = AimCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide;
 		var targetSide = 1f - side;
 		var offset = AimCamera.GetCinemachineComponent<CinemachineComposer>().m_TrackedObjectOffset;
@@ -198,6 +200,8 @@ public class PlayerController : ThirdPersonCharacterController
 	    UpdateCameraNoise();
 	    //print (move());
     }
+    
+	public void MuzzleClimb(float angle) => _cinemachineTargetPitch += angle;
 
 	private void UpdateCameraNoise() // update the cinemachine noise based on idle/walking/running
 	{

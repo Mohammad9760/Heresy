@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
 		
 		InputMaps.UI.Back.performed += (_) => IsGamePaused = !IsGamePaused;
 		OnPauseToggled += PauseToggled;
+		
+		Game.Player = GameObject.FindObjectOfType<PlayerController>();
 	}
 	
 	private void Start()
@@ -50,6 +52,11 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = IsGamePaused ? 0: 1;
 		Cursor.lockState = IsGamePaused ? CursorLockMode.Confined: CursorLockMode.Locked;
 	}
+}
+
+public class Game
+{
+	public static PlayerController Player;
 }
 
 public static class Settings

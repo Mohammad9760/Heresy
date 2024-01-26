@@ -12,5 +12,5 @@ public class GunProperties : ScriptableObject
     public float RoundPerSecond = 10;
 	public FireMode fireMode;
     
-    
+	public float muzzleClimb = 5, spread = 0.1f;
 }

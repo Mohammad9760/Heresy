@@ -18,7 +18,7 @@ public class Gun : MonoBehaviour
 {
 	public LayerMask raycastLayers;
 	private static Camera camera;
-	private Vector3 viewportCenter = new Vector3(0.5f, 0.5f, 0.0f);
+	private static Vector3 viewportCenter = new Vector3(0.5f, 0.5f, 0.0f);
 	
 	public VisualEffect effects;
 	public AudioClip emptySFX, reloadSFX, equipSFX;
@@ -41,7 +41,7 @@ public class Gun : MonoBehaviour
 	private float FiringDelay => 1f / Specs.RoundPerSecond; // delay between each shot
     private float nextTimeToFire;
     private byte fireControl = 0;
-
+	private Vector3 inaccuracy => new Vector3(Specs.spread, Specs.spread, 0) * Random.Range(-1f, 1f);
 
 	private bool triggered; // is trigger pulled this frame
 	public bool TriggerPulled 
@@ -60,6 +60,7 @@ public class Gun : MonoBehaviour
 	{
 		if(camera == null)
 			camera = Camera.main;
+
 		animator = GetComponent<Animator>();
 		audioSource = GetComponent<AudioSource>();
 		parentConstraint = GetComponent<ParentConstraint>();
@@ -126,7 +127,7 @@ public class Gun : MonoBehaviour
 
     public virtual void Shoot()
     {
-	    Ray bullet = camera.ViewportPointToRay(viewportCenter);
+	    Ray bullet = camera.ViewportPointToRay(viewportCenter + inaccuracy);
 	    RaycastHit hit;
 	    if(Physics.Raycast(bullet, out hit, Specs.ammunition.range, raycastLayers))
 	    {
@@ -138,9 +139,9 @@ public class Gun : MonoBehaviour
 	    	effects.SetVector3("impact_point", bullet.origin + bullet.direction * 100);
 	    }
 	    effects.Play();
+	    Game.Player.MuzzleClimb(-Specs.muzzleClimb * Random.Range(0.4f, 1));
     }
-    
-    
+
 	private bool equipped;
 	public bool Equipped
 	{
