@@ -36,5 +36,12 @@ public class Gunner : MonoBehaviour
 	{
 		
 	}
+	
+	public void SwitchGun(int direction)
+	{
+		selectedGun.Equipped = false;
+		selectedGun = guns[System.Array.IndexOf(guns, selectedGun) + direction > 0? 1: -1];
+		selectedGun.Equipped = true;
+	}
 
 }

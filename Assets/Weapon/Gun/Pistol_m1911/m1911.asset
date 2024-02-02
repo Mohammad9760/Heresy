@@ -17,3 +17,4 @@ MonoBehaviour:
   RoundPerSecond: 2.4
   fireMode: 1
   muzzleClimb: 3
+  spread: 0

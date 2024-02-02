@@ -68,13 +68,9 @@ public class Gun : MonoBehaviour
 		// temp
 		//ReloadFinished = true;
 		//magazineRounds = Specs.magazineCapacity;
+		Equipped = false;
 		Ammo.add(Specs.ammunition, 17);
 		
-	}
-    
-	private void Update()
-	{
-		print(magazineRounds + " / " + Ammo.count(Specs.ammunition));
 	}
 
 	public virtual IEnumerator Reload()

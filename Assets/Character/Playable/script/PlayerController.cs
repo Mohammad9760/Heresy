@@ -32,7 +32,7 @@ public class PlayerController : ThirdPersonCharacterController
     public PositionConstraint cameraRigPositionConstraint;
     public Rig lookRig, aimRig;
 	private Animator _animator => character._animator;
-	private Coroutine shoulderSwitching;
+	private Coroutine shoulderSwitching, aimCoroutine;
 	
 	private Gunner gun;
     #endregion
@@ -59,7 +59,7 @@ public class PlayerController : ThirdPersonCharacterController
 		    _ads = value;
             
 		    AimCamera.gameObject.SetActive(ADS);
-		    StartCoroutine (UpdateLayerWeights());
+		    aimCoroutine = StartCoroutine (UpdateLayerWeights());
 		    //ActivateAim(ADS);
         }
 	}
@@ -75,19 +75,20 @@ public class PlayerController : ThirdPersonCharacterController
 		//_animator.SetLayerWeight(gun.AimLayerIndex, aiming? 1: 0);
 		//_animator.SetLayerWeight(gun.ReloadLayerIndex, 0);
 	//}
-	private IEnumerator UpdateLayerWeights(float interpolationSpeed = 5f)
+	private IEnumerator UpdateLayerWeights(float interpolationSpeed = 6.5f)
 	{
-		_animator.SetLayerWeight(gun.ReloadLayerIndex, 0);
-		
-		
+		yield return aimCoroutine;
+		var reloadLayerWeight = gun.IsDuringReload ? 1f: 0f;
 		var aimLayerWeight = ADS? 1f: 0f;
 		for (float t = 0; ; t += Time.deltaTime * interpolationSpeed) 
 		{
 			cameraRigPositionConstraint.weight = aimLayerWeight * t;
-			aimRig.weight = aimLayerWeight * t;
-			lookRig.weight = 1f - aimLayerWeight * t;
-			_animator.SetLayerWeight(gun.LocomotionLayerIndex, 1f - aimLayerWeight * t);
-			_animator.SetLayerWeight(gun.AimLayerIndex, aimLayerWeight * t);
+			aimRig.weight = Mathf.Lerp(aimRig.weight, aimLayerWeight, t);
+			lookRig.weight = Mathf.Lerp(lookRig.weight, gun.IsDuringReload? 0f: 1f - aimLayerWeight, t);
+			print(lookRig.weight);
+			_animator.SetLayerWeight(gun.LocomotionLayerIndex, lookRig.weight);
+			_animator.SetLayerWeight(gun.AimLayerIndex, aimRig.weight);
+			_animator.SetLayerWeight(gun.ReloadLayerIndex, reloadLayerWeight * t);
 			
 			yield return null;
 			if(Mathf.Clamp01(t) == 1) break;
@@ -112,6 +113,7 @@ public class PlayerController : ThirdPersonCharacterController
 	    character = GetComponent<ThirdPersonCharacter>();
 	    followCameraNoise = FollowCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 	    
+	    _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 	    // this property exist so that NPCs that use the thirdperson code don't move based on camera
 	    character.CameraRelativeMovement = true;
         
@@ -124,6 +126,13 @@ public class PlayerController : ThirdPersonCharacterController
 	    _input.Attack.canceled += (ctx) => Attack(false);
 	    _input.Reload.performed += (ctx) => Reload();
 	    _input.SwitchShoulder.performed += (ctx) => shoulderSwitching = StartCoroutine(switchShoulder());
+	    _input.SwitchWeapon.performed += (ctx) => 
+	    {
+		    gun.SwitchGun((int)ctx.ReadValue<Vector2>().y);
+	    	_animator.SetLayerWeight(gun.ReloadLayerIndex, 1);
+		    _animator.SetBool("Equipped", true);
+		    _animator.SetLayerWeight(gun.LocomotionLayerIndex, 1);
+	    };
 
     }
     
@@ -137,9 +146,12 @@ public class PlayerController : ThirdPersonCharacterController
 	{
 		if(!gun.CanReload) return;
 		ADS = false;
-		_animator.SetLayerWeight(gun.ReloadLayerIndex, 1);
+		//_animator.SetLayerWeight(gun.ReloadLayerIndex, 1);
 		_animator.SetTrigger("Reload");
 		gun.Reload();
+		aimCoroutine = StartCoroutine(UpdateLayerWeights(3));
+		//aimRig.weight = 0;
+		//lookRig.weight = 0;
 	}
 
     //private IEnumerator crouchCameraDistanceAnimation()
@@ -189,8 +201,6 @@ public class PlayerController : ThirdPersonCharacterController
 
     private void Start()
     {
-        _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-        // activeCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide = 1;
     }
 
     private void LateUpdate()
@@ -198,7 +208,6 @@ public class PlayerController : ThirdPersonCharacterController
 	    UpdateLooking();
 	    CameraRotation();
 	    UpdateCameraNoise();
-	    //print (move());
     }
     
 	public void MuzzleClimb(float angle) => _cinemachineTargetPitch += angle;
@@ -209,7 +218,7 @@ public class PlayerController : ThirdPersonCharacterController
 	}
 
     private void CameraRotation()
-    {
+	{
         // if there is an input and camera position is not fixed
         if (look().sqrMagnitude >= _threshold && !LockCameraPosition)
         {
@@ -237,7 +246,8 @@ public class PlayerController : ThirdPersonCharacterController
     }
 
     private void UpdateLooking()
-	{   
+	{
+		if(gun.IsDuringReload) return;
 		// Update Loot Target position
 		
         Ray look = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
@@ -261,7 +271,7 @@ public class PlayerController : ThirdPersonCharacterController
             targetPosition = Camera.main.transform.position + Camera.main.transform.forward * 100;
         }
 		if(ADS) return;
-        lookTarget.position = Vector3.SmoothDamp(lookTarget.position, targetPosition, ref lookVelocity, Time.deltaTime, Vector3.Distance(lookTarget.position, targetPosition) * 20);
+		lookTarget.position = Vector3.SmoothDamp(lookTarget.position, targetPosition, ref lookVelocity, Time.deltaTime, Vector3.Distance(lookTarget.position, targetPosition) * 20);
 
 		// Update Look Rig wieght
         
